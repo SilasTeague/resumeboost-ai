@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({"message": "Resume Keyword Optimizer APAI is running!"})
+    return jsonify({"message": "Resume Keyword Optimizer API is running!"})
 
 if __name__ == "__main__":
     app.run(debug=True)
