@@ -1,6 +1,7 @@
 import os
 from flask import Flask, request, jsonify
 from backend.models import db, bcrypt
+from backend.resume_routes import resume_bp
 
 app = Flask(__name__)
 
@@ -12,6 +13,8 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 # Initialize database and bcrypt
 db.init_app(app)
 bcrypt.init_app(app)
+
+app.register_blueprint(resume_bp, url_prefix="/resume")
 
 with app.app_context():
     db.create_all()
