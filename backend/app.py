@@ -16,9 +16,5 @@ bcrypt.init_app(app)
 with app.app_context():
     db.create_all()
 
-@app.route("/", methods=["GET"])
-def home():
-    return jsonify({"message": "Resume Keyword Optimizer API is running!"})
-
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,6 +1,10 @@
 from flask import request, jsonify
 from backend.app import app, db
-from backend.models import User
+from backend.models import User, bcrypt
+
+@app.route("/", methods=["GET"])
+def home():
+    return jsonify({"message": "Resume Keyword Optimizer API is running!"})
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -9,9 +13,15 @@ def signup():
     if User.query.filter_by(username=data['username']).first():
         return jsonify({'message': 'Username already exists'}), 400
     
-    new_user = User(username=data['username'], security_question=data['security_question'])
-    new_user.set_password(data['password'])
+    hashed_password = bcrypt.generate_password_hash(data["password"]).decode("utf-8")
 
+    new_user = User(
+        username=data["username"],
+        password=hashed_password,
+        security_question=data["security_question"],
+        security_answer=data["security_answer"]
+    )
+    
     db.session.add(new_user)
     db.session.commit()
 
