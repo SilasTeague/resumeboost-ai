@@ -35,7 +35,7 @@ def login():
     if user and user.check_password(data['password']):
         return jsonify({'message': 'Login successful'}), 200
     else:
-        return jsonify({'message: Invalid credentials'}), 401
+        return jsonify({'message': 'Invalid credentials'}), 401
     
 @app.route('/reset_password', methods=['POST'])
 def reset_password():
