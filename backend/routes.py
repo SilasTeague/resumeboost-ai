@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from app import app, db
-from models import User, bcrypt
+from backend.models import User, bcrypt
 
 @app.route("/", methods=["GET"])
 def home():
