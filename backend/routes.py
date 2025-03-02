@@ -1,4 +1,5 @@
 from flask import request, jsonify
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app import app, db
 from backend.models import User, bcrypt
 
@@ -33,9 +34,15 @@ def login():
     user = User.query.filter_by(username=data['username']).first()
 
     if user and user.check_password(data['password']):
-        return jsonify({'message': 'Login successful'}), 200
+        access_token = create_access_token(identity=user.username)
+        return jsonify({'access_token': 'access_token'}), 200
     else:
         return jsonify({'message': 'Invalid credentials'}), 401
+    
+@app.route('/optimizer', methods=['GET'])
+@jwt_required()
+def optimizer():
+    return "TODO: Implement optimizer GUI"
     
 @app.route('/reset_password', methods=['POST'])
 def reset_password():
