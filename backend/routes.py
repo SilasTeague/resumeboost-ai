@@ -19,7 +19,7 @@ def signup():
     if data['password'] != data['confirm_password']:
         return jsonify({'error': 'Passwords do not match'}), 400
     
-    if len(data["password"]) < 8:
+    if len(data['password']) < 8:
         return jsonify({'error': 'Password must be at least 8 characters long'}), 400
 
     if User.query.filter_by(username=data['username']).first():
@@ -65,7 +65,18 @@ def reset_password():
     data = request.json
     user = User.query.filter_by(username=data['username']).first()
 
-    if user and user.security_question == data['security_question']:
+    required_fields = ['username', 'security_question', 'security_answer', 'new_password', 'confirm_password']
+    for field in required_fields:
+        if not data.get(field):
+            return jsonify({'error': f'{field.replace("_", " ").title()} is required'}), 400
+        
+    if data["new_password"] != data["confirm_password"]:
+        return jsonify({'error': 'Passwords do not match'}), 400
+
+    if len(data['password']) < 8:
+        return jsonify({'error': 'Password must be at least 8 characters long'}), 400
+
+    if user and bcrypt.check_password_hash(user.security_answer, data['security_answer']):
         user.set_password(data['new_password'])
         db.session.commit()
         return jsonify({'message': 'Password reset successful'}), 200
