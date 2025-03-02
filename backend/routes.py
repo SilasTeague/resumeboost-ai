@@ -43,11 +43,15 @@ def signup():
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
+
+    if not data.get('username') or not data.get('password'):
+        return jsonify({'error': 'Username and password are required'}), 400
+
     user = User.query.filter_by(username=data['username']).first()
 
     if user and user.check_password(data['password']):
         access_token = create_access_token(identity=user.username)
-        return jsonify({'access_token': 'access_token'}), 200
+        return jsonify({'access_token': access_token}), 200
     else:
         return jsonify({'message': 'Invalid credentials'}), 401
     
