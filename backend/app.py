@@ -2,9 +2,11 @@ import os
 from flask import Flask, request, jsonify
 from backend.models import db, bcrypt
 from backend.resume_routes import resume_bp
-from flask_jwt_extended import JWTMANAGER
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
+
+from backend import routes
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../database"))
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "users.db")}'
@@ -15,7 +17,7 @@ app.config['JWT_SECRET_KEY'] = 'jwt_secret_key'
 # Initialize database and bcrypt
 db.init_app(app)
 bcrypt.init_app(app)
-jwt = JWTMANAGER
+jwt = JWTManager(app)
 
 app.register_blueprint(resume_bp, url_prefix="/resume")
 
