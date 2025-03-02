@@ -11,16 +11,28 @@ def home():
 def signup():
     data = request.json
 
+    required_fields = ['username', 'password', 'confirm_password', 'security_question', 'security_answer']
+    for field in required_fields:
+        if not data.get(field):
+            return jsonify({'error': f'{field.replace("_", " ").title()} is required'}), 400
+        
+    if data['password'] != data['confirm_password']:
+        return jsonify({'error': 'Passwords do not match'}), 400
+    
+    if len(data["password"]) < 8:
+        return jsonify({'error': 'Password must be at least 8 characters long'}), 400
+
     if User.query.filter_by(username=data['username']).first():
         return jsonify({'message': 'Username already exists'}), 400
     
     hashed_password = bcrypt.generate_password_hash(data["password"]).decode("utf-8")
+    hashed_answer = bcrypt.generate_password_hash(data["security_answer"]).decode("utf-8")
 
     new_user = User(
         username=data["username"],
         password=hashed_password,
         security_question=data["security_question"],
-        security_answer=data["security_answer"]
+        security_answer=hashed_answer
     )
     
     db.session.add(new_user)
