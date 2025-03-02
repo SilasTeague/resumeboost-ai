@@ -34,7 +34,7 @@ def signup():
 
     new_user = User(
         username=data["username"],
-        password=hashed_password,
+        password_hash=hashed_password,
         security_question=data["security_question"],
         security_answer=hashed_answer
     )
