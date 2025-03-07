@@ -1,10 +1,7 @@
-from flask import request, jsonify, redirect, url_for, render_template
+from flask import request, jsonify, redirect, url_for, render_template, session
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from backend.app import app, db
 from backend.models import User, bcrypt
-
-import os
-print("Template path:", os.path.abspath("backend/templates/signup.html"))
 
 @app.route("/", methods=["GET"])
 def home():
@@ -42,26 +39,33 @@ def signup():
     db.session.add(new_user)
     db.session.commit()
 
-    return redirect(url_for('login'))
+    access_token = create_access_token(identity=new_user.username)
+    session['access_token'] = access_token
+    return redirect(url_for('optimize'))
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    data = request.json
+    if request.method == 'GET':
+        return render_template('login.html')
+
+    data = request.form
 
     if not data.get('username') or not data.get('password'):
-        return jsonify({'error': 'Username and password are required'}), 400
+        return render_template('login.html', error="Username and password are required")
 
     user = User.query.filter_by(username=data['username']).first()
 
     if user and user.check_password(data['password']):
         access_token = create_access_token(identity=user.username)
-        return jsonify({'access_token': access_token}), 200
+        session['access_token'] = access_token
+        return redirect(url_for('optimizer')), 200
     else:
-        return jsonify({'message': 'Invalid credentials'}), 401
+        return render_template('login.html', error="Invalid credentials")
     
 @app.route('/optimizer', methods=['GET'])
-@jwt_required()
 def optimizer():
+    if 'access_token' not in session:
+        return redirect(url_for('login'))
     return "TODO: Implement optimizer GUI"
     
 @app.route('/reset_password', methods=['POST'])
@@ -77,7 +81,7 @@ def reset_password():
     if data["new_password"] != data["confirm_password"]:
         return jsonify({'error': 'Passwords do not match'}), 400
 
-    if len(data['password']) < 8:
+    if len(data['new_password']) < 8:
         return jsonify({'error': 'Password must be at least 8 characters long'}), 400
 
     if user and bcrypt.check_password_hash(user.security_answer, data['security_answer']):

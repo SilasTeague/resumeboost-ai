@@ -3,9 +3,7 @@ from flask import Flask, request, jsonify
 from backend.models import db, bcrypt
 from backend.resume_routes import resume_bp
 from flask_jwt_extended import JWTManager
-
 app = Flask(__name__)
-
 from backend import routes
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../database"))
