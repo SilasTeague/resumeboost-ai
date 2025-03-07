@@ -1,5 +1,5 @@
-from flask import request, jsonify, redirect, url_for, render_template, session
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+from flask_login import login_user, login_required, logout_user, current_user
 from backend.app import app, db
 from backend.models import User, bcrypt
 
@@ -39,8 +39,7 @@ def signup():
     db.session.add(new_user)
     db.session.commit()
 
-    access_token = create_access_token(identity=new_user.username)
-    session['access_token'] = access_token
+    login_user(new_user)
     return redirect(url_for('optimize'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -56,13 +55,19 @@ def login():
     user = User.query.filter_by(username=data['username']).first()
 
     if user and user.check_password(data['password']):
-        access_token = create_access_token(identity=user.username)
-        session['access_token'] = access_token
+        login_user(user)
         return redirect(url_for('optimizer')), 200
     else:
         return render_template('login.html', error="Invalid credentials")
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
     
 @app.route('/optimizer', methods=['GET'])
+@login_required
 def optimizer():
     if 'access_token' not in session:
         return redirect(url_for('login'))
