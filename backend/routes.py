@@ -56,7 +56,7 @@ def login():
 
     if user and user.check_password(data['password']):
         login_user(user)
-        return redirect(url_for('optimizer')), 200
+        return redirect(url_for('optimizer'))
     else:
         return render_template('login.html', error="Invalid credentials")
 
