@@ -66,12 +66,14 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
     
-@app.route('/optimizer', methods=['GET'])
+@app.route('/optimizer', methods=['GET', 'POST'])
 @login_required
 def optimizer():
     if 'access_token' not in session:
         return redirect(url_for('login'))
-    return "TODO: Implement optimizer GUI"
+    if request.method == "GET":
+        return render_template('optimizer.html')
+    
     
 @app.route('/reset_password', methods=['POST'])
 def reset_password():

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Optimizer</title>
+    <script>
+        async function optimizeResume(event) {
+            event.preventDefault(); 
+
+            const resumeText = document.getElementById("resume_text").value;
+            const jobDescription = document.getElementById("job_description").value;
+
+            if (!resumeText.trim()) {
+                alert("Please enter your resume text.");
+                return;
+            }
+
+            const response = await fetch("resume/optimize", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    resume_text: resumeText,
+                    job_description: jobDescription
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                document.getElementById("optimized_resume").innerText = result.optimized_resume;
+            } else {
+                document.getElementById("optimized_resume").innerText = "Error: " + result.error;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Resume Optimizer</h1>
+    <form onsubmit="optimizeResume(event)">
+        <label for="resume_text">Your Resume:</label><br>
+        <textarea id="resume_text" name="resume_text" rows="10" cols="50" required></textarea><br><br>
+
+        <label for="job_description">Job Description (Optional):</label><br>
+        <textarea id="job_description" name="job_description" rows="5" cols="50"></textarea><br><br>
+
+        <button type="submit">Optimize Resume</button>
+    </form>
+
+    <h2>Optimized Resume:</h2>
+    <pre id="optimized_resume"></pre>
+</body>
+</html>
